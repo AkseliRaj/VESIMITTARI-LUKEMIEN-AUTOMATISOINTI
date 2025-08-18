@@ -1,0 +1,124 @@
+/* Admin Dashboard Styles */
+.condominium-selector {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.condominium-selector label {
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.condominium-selector select {
+    min-width: 300px;
+    padding: 8px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.condominium-info {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.condominium-info h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.charts-section {
+    margin: 30px 0;
+}
+
+.chart-container {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.chart-container canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.readings-table-section {
+    margin: 30px 0;
+}
+
+.consumption-diff {
+    color: #0073aa;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.no-condominium-selected {
+    background: #fff;
+    padding: 40px;
+    text-align: center;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    color: #666;
+}
+
+/* Condominiums Management Page */
+.add-condominium-section {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.add-condominium-section h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.add-condominium-form .form-table th {
+    width: 200px;
+}
+
+.existing-condominiums-section {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+.existing-condominiums-section h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .condominium-selector select {
+        min-width: 200px;
+        width: 100%;
+    }
+    
+    .chart-container {
+        padding: 10px;
+    }
+    
+    .add-condominium-form .form-table th {
+        width: auto;
+        display: block;
+        padding-bottom: 5px;
+    }
+    
+    .add-condominium-form .form-table td {
+        display: block;
+        padding-left: 0;
+    }
+}
