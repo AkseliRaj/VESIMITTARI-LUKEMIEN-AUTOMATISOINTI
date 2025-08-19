@@ -19,7 +19,11 @@ if ($selected_condominium_id) {
     
     // Get readings for the selected condominium
     $readings = $wpdb->get_results($wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}water_meter_readings WHERE condominium_id = %d ORDER BY submitted_at DESC",
+        "SELECT r.*, a.address_text 
+         FROM {$wpdb->prefix}water_meter_readings r 
+         LEFT JOIN {$wpdb->prefix}water_meter_addresses a ON r.address_id = a.id 
+         WHERE r.condominium_id = %d 
+         ORDER BY r.submitted_at DESC",
         $selected_condominium_id
     ));
 }
@@ -72,6 +76,7 @@ if ($selected_condominium_id) {
                     <thead>
                         <tr>
                             <th><?php _e('Date', 'water-meter-readings'); ?></th>
+                            <th><?php _e('Address', 'water-meter-readings'); ?></th>
                             <th><?php _e('Hot Water', 'water-meter-readings'); ?></th>
                             <th><?php _e('Cold Water', 'water-meter-readings'); ?></th>
                             <th><?php _e('Total', 'water-meter-readings'); ?></th>
@@ -91,6 +96,7 @@ if ($selected_condominium_id) {
                         ?>
                             <tr>
                                 <td><?php echo date('d.m.Y H:i', strtotime($reading->submitted_at)); ?></td>
+                                <td><?php echo esc_html($reading->address_text); ?></td>
                                 <td>
                                     <?php echo number_format($reading->hot_water, 2); ?>
                                     <?php if ($hot_diff > 0): ?>

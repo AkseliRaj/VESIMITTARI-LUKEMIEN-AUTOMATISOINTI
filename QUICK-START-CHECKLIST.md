@@ -1,106 +1,106 @@
-# 🚀 Quick Start Checklist - WordPress Test Site
+# Quick Start Checklist - Water Meter Readings Plugin
 
-## ✅ Prerequisites
-- [ ] XAMPP installed and running (Apache + MySQL)
-- [ ] WordPress downloaded
-- [ ] Plugin files ready
+## Installation & Setup
 
-## 🛠️ Setup Steps
+### 1. Plugin Installation
+- [ ] Upload plugin files to `/wp-content/plugins/water-meter-readings/`
+- [ ] Activate the plugin in WordPress Admin → Plugins
+- [ ] Verify database tables are created automatically
 
-### 1. WordPress Installation
-- [ ] Extract WordPress to `C:\xampp\htdocs\water-meter-test\`
-- [ ] Open http://localhost/phpmyadmin
-- [ ] Create database: `water_meter_test`
-- [ ] Open http://localhost/water-meter-test
-- [ ] Complete WordPress installation
-- [ ] Note down admin username/password
+### 2. Admin Configuration
 
-### 2. Plugin Installation
-- [ ] Copy plugin files to `wp-content/plugins/water-meter-readings/`
-- [ ] Go to WordPress Admin → Plugins
-- [ ] Activate "Water Meter Readings" plugin
-- [ ] Verify plugin appears in admin menu
+#### Step 1: Add Condominiums
+- [ ] Go to WordPress Admin → Water Meters → Condominiums
+- [ ] Add your first condominium:
+  - **Number**: Enter unique identifier (e.g., "A001", "B002")
+  - **Name**: Enter display name (e.g., "Haarantie 2")
+  - **Address**: Enter physical address (optional)
+- [ ] Add additional condominiums as needed
 
-### 3. Add Test Data (Optional)
-- [ ] Open phpMyAdmin
-- [ ] Select `water_meter_test` database
-- [ ] Import `test-data.sql` file
-- [ ] Or manually add condominiums through admin
+#### Step 2: Add Addresses
+- [ ] Go to WordPress Admin → Water Meters → Addresses
+- [ ] Select a condominium from the dropdown
+- [ ] Add addresses for that condominium:
+  - **Address**: Enter address text (e.g., "Haarantie 2 A1", "Haarantie 2 A2", "Haarantie 2 B1")
+- [ ] Repeat for all condominiums
 
-### 4. Create Public Page
-- [ ] Go to Pages → Add New
-- [ ] Title: "Water Meter Readings"
-- [ ] Add shortcode: `[water_meter_form]`
-- [ ] Publish page
+### 3. Public Form Setup
+- [ ] Create a new page or post
+- [ ] Add the shortcode: `[water_meter_form]`
+- [ ] Publish the page
+- [ ] Test the form flow:
+  - Enter condominium number
+  - Verify address dropdown appears
+  - Submit a test reading
 
-## 🧪 Testing Checklist
+### 4. Testing the System
+- [ ] Submit a test reading through the public form
+- [ ] Verify data appears in admin dashboard
+- [ ] Check charts and tables display correctly
+- [ ] Test responsive design on mobile devices
 
-### Admin Features
-- [ ] Access Water Meters → Condominiums
-- [ ] Add new condominium (A001, Test Building)
-- [ ] Access Water Meters → Dashboard
-- [ ] Select condominium from dropdown
-- [ ] View charts and data table
+## Form Flow for Users
 
-### Public Features
-- [ ] Visit public page with form
-- [ ] Submit test reading (A001, 100.50, 200.75)
-- [ ] Verify success message
-- [ ] Check data appears in admin dashboard
+### Step 1: Condominium Number
+1. User enters condominium number (e.g., "A001")
+2. Clicks "Jatka" (Continue)
+3. System validates condominium and loads addresses
 
-### Charts and Data
-- [ ] View water levels chart
-- [ ] View consumption chart
-- [ ] Check consumption differences in table
-- [ ] Test responsive design on mobile
+### Step 2: Reading Details
+1. User selects address from dropdown
+2. Enters reading date (defaults to today)
+3. Enters hot water reading
+4. Enters cold water reading
+5. Adds optional notes
+6. Clicks "Lähetä lukemat" (Submit readings)
 
-## 🔧 Troubleshooting
+## Admin Features
+
+### Dashboard
+- [ ] View water consumption charts
+- [ ] See readings table with address information
+- [ ] Track consumption over time
+
+### Condominium Management
+- [ ] Add new condominiums
+- [ ] Edit existing condominiums
+- [ ] Delete condominiums (with confirmation)
+
+### Address Management
+- [ ] Add addresses to condominiums
+- [ ] Edit address names
+- [ ] Delete addresses (with confirmation)
+
+## Troubleshooting
 
 ### Common Issues
-- [ ] Plugin not appearing → Check file permissions
-- [ ] Database tables missing → Deactivate/reactivate plugin
-- [ ] Form not working → Check browser console
-- [ ] Charts not showing → Verify Chart.js loading
+- [ ] **Form not working**: Check if jQuery is loaded
+- [ ] **No addresses showing**: Verify addresses are added in admin
+- [ ] **Charts not displaying**: Check if data exists for selected condominium
+- [ ] **Database errors**: Verify WordPress database permissions
 
-### Debug Mode
-Add to `wp-config.php`:
-```php
-define('WP_DEBUG', true);
-define('WP_DEBUG_LOG', true);
-define('WP_DEBUG_DISPLAY', false);
-```
+### Testing Checklist
+- [ ] Test with different condominium numbers
+- [ ] Test with various address selections
+- [ ] Test form validation (empty fields, invalid numbers)
+- [ ] Test responsive design on different screen sizes
+- [ ] Verify data integrity in admin dashboard
 
-## 📊 Sample Test Data
+## Security Notes
+- [ ] All form submissions use WordPress nonces
+- [ ] Input data is properly sanitized
+- [ ] Database queries use prepared statements
+- [ ] Admin functions check user capabilities
 
-### Condominiums
-```
-A001 - Asunto Oy Testitalo A
-B002 - Asunto Oy Testitalo B  
-C003 - Asunto Oy Testitalo C
-D004 - Asunto Oy Testitalo D
-```
-
-### Test Readings
-```
-A001: Hot 100.50, Cold 200.75
-B002: Hot 150.00, Cold 300.00
-C003: Hot 75.25, Cold 150.50
-```
-
-## 🎯 Success Criteria
-- [ ] WordPress site loads at http://localhost/water-meter-test
-- [ ] Plugin appears in admin menu
-- [ ] Can add condominiums
-- [ ] Public form works
-- [ ] Charts display data
-- [ ] Responsive design works
-
-## 📞 Next Steps
-- [ ] Test all features thoroughly
-- [ ] Customize styling if needed
-- [ ] Add more test data
-- [ ] Consider production deployment
+## Performance Tips
+- [ ] Limit number of addresses per condominium for better performance
+- [ ] Regular database maintenance for large datasets
+- [ ] Consider caching for frequently accessed data
 
 ---
 
-**Need Help?** Check the detailed setup guide in `setup-wordpress-test-site.md`
+**Need Help?**
+- Check the main README.md file
+- Review WordPress error logs
+- Test with default WordPress theme
+- Disable other plugins to check for conflicts

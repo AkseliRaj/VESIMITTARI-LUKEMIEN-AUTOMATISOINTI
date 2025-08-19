@@ -40,6 +40,8 @@ class WaterMeterReadings {
         // Add AJAX handlers
         add_action('wp_ajax_submit_water_reading', array($this, 'submit_water_reading'));
         add_action('wp_ajax_nopriv_submit_water_reading', array($this, 'submit_water_reading'));
+        add_action('wp_ajax_get_condominium_addresses', array($this, 'get_condominium_addresses'));
+        add_action('wp_ajax_nopriv_get_condominium_addresses', array($this, 'get_condominium_addresses'));
         
         // Add admin menu
         add_action('admin_menu', array($this, 'admin_menu'));
@@ -70,22 +72,39 @@ class WaterMeterReadings {
             UNIQUE KEY condominium_number (condominium_number)
         ) $charset_collate;";
         
+        // Addresses table
+        $table_addresses = $wpdb->prefix . 'water_meter_addresses';
+        $sql_addresses = "CREATE TABLE $table_addresses (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            condominium_id mediumint(9) NOT NULL,
+            address_text varchar(255) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY condominium_id (condominium_id),
+            FOREIGN KEY (condominium_id) REFERENCES $table_condominiums(id) ON DELETE CASCADE
+        ) $charset_collate;";
+        
         // Water readings table
         $table_readings = $wpdb->prefix . 'water_meter_readings';
         $sql_readings = "CREATE TABLE $table_readings (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
             condominium_id mediumint(9) NOT NULL,
+            address_id mediumint(9) NOT NULL,
+            reading_date date NOT NULL,
             hot_water decimal(10,2) NOT NULL,
             cold_water decimal(10,2) NOT NULL,
             notes text,
             submitted_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             KEY condominium_id (condominium_id),
-            FOREIGN KEY (condominium_id) REFERENCES $table_condominiums(id) ON DELETE CASCADE
+            KEY address_id (address_id),
+            FOREIGN KEY (condominium_id) REFERENCES $table_condominiums(id) ON DELETE CASCADE,
+            FOREIGN KEY (address_id) REFERENCES $table_addresses(id) ON DELETE CASCADE
         ) $charset_collate;";
         
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql_condominiums);
+        dbDelta($sql_addresses);
         dbDelta($sql_readings);
     }
     
@@ -125,6 +144,15 @@ class WaterMeterReadings {
             'water-meter-condominiums',
             array($this, 'condominiums_page')
         );
+        
+        add_submenu_page(
+            'water-meter-readings',
+            __('Addresses', 'water-meter-readings'),
+            __('Addresses', 'water-meter-readings'),
+            'manage_options',
+            'water-meter-addresses',
+            array($this, 'addresses_page')
+        );
     }
     
     public function render_form() {
@@ -137,6 +165,8 @@ class WaterMeterReadings {
         check_ajax_referer('wmr_nonce', 'nonce');
         
         $condominium_number = sanitize_text_field($_POST['condominium_number']);
+        $address_id = intval($_POST['address_id']);
+        $reading_date = sanitize_text_field($_POST['reading_date']);
         $hot_water = floatval($_POST['hot_water']);
         $cold_water = floatval($_POST['cold_water']);
         $notes = sanitize_textarea_field($_POST['notes']);
@@ -153,16 +183,29 @@ class WaterMeterReadings {
             wp_die(json_encode(array('success' => false, 'message' => 'Condominium not found')));
         }
         
+        // Check if address exists and belongs to the condominium
+        $address = $wpdb->get_row($wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}water_meter_addresses WHERE id = %d AND condominium_id = %d",
+            $address_id,
+            $condominium->id
+        ));
+        
+        if (!$address) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Invalid address selected')));
+        }
+        
         // Insert reading
         $result = $wpdb->insert(
             $wpdb->prefix . 'water_meter_readings',
             array(
                 'condominium_id' => $condominium->id,
+                'address_id' => $address_id,
+                'reading_date' => $reading_date,
                 'hot_water' => $hot_water,
                 'cold_water' => $cold_water,
                 'notes' => $notes
             ),
-            array('%d', '%f', '%f', '%s')
+            array('%d', '%d', '%s', '%f', '%f', '%s')
         );
         
         if ($result) {
@@ -172,12 +215,49 @@ class WaterMeterReadings {
         }
     }
     
+    public function get_condominium_addresses() {
+        check_ajax_referer('wmr_nonce', 'nonce');
+        
+        $condominium_number = sanitize_text_field($_POST['condominium_number']);
+        
+        global $wpdb;
+        
+        // Get condominium and its addresses
+        $condominium = $wpdb->get_row($wpdb->prepare(
+            "SELECT id, name FROM {$wpdb->prefix}water_meter_condominiums WHERE condominium_number = %s",
+            $condominium_number
+        ));
+        
+        if (!$condominium) {
+            wp_die(json_encode(array('success' => false, 'message' => 'Condominium not found')));
+        }
+        
+        $addresses = $wpdb->get_results($wpdb->prepare(
+            "SELECT id, address_text FROM {$wpdb->prefix}water_meter_addresses WHERE condominium_id = %d ORDER BY address_text",
+            $condominium->id
+        ));
+        
+        if (empty($addresses)) {
+            wp_die(json_encode(array('success' => false, 'message' => 'No addresses found for this condominium')));
+        }
+        
+        wp_die(json_encode(array(
+            'success' => true,
+            'condominium' => $condominium,
+            'addresses' => $addresses
+        )));
+    }
+    
     public function admin_page() {
         include WMR_PLUGIN_PATH . 'templates/admin-dashboard.php';
     }
     
     public function condominiums_page() {
         include WMR_PLUGIN_PATH . 'templates/admin-condominiums.php';
+    }
+    
+    public function addresses_page() {
+        include WMR_PLUGIN_PATH . 'templates/admin-addresses.php';
     }
 }
 

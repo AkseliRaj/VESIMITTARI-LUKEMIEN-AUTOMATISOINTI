@@ -1,10 +1,29 @@
 <div class="water-meter-form-container">
-    <h2><?php _e('Vesimittarin lukemien syöttö', 'water-meter-readings'); ?></h2>
     
-    <form id="water-meter-form" class="water-meter-form">
+    <!-- Step 1: Condominium Number -->
+    <form id="step1-form" class="water-meter-form step-form" style="display: block;">
         <div class="form-group">
             <label for="condominium_number"><?php _e('Taloyhtiön numero', 'water-meter-readings'); ?> *</label>
             <input type="text" id="condominium_number" name="condominium_number" required>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="submit-btn"><?php _e('Jatka', 'water-meter-readings'); ?></button>
+        </div>
+    </form>
+    
+    <!-- Step 2: Water Meter Readings -->
+    <form id="step2-form" class="water-meter-form step-form" style="display: none;">
+        <div class="form-group">
+            <label for="address_select"><?php _e('Osoite', 'water-meter-readings'); ?> *</label>
+            <select id="address_select" name="address_id" required>
+                <option value=""><?php _e('-- Valitse osoite --', 'water-meter-readings'); ?></option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="reading_date"><?php _e('Päivämäärä', 'water-meter-readings'); ?> *</label>
+            <input type="date" id="reading_date" name="reading_date" required>
         </div>
         
         <div class="form-group">
@@ -23,7 +42,10 @@
         </div>
         
         <div class="form-group">
-            <button type="submit" class="submit-btn"><?php _e('Lähetä lukemat', 'water-meter-readings'); ?></button>
+            <div class="form-buttons">
+                <button type="button" id="back-btn" class="back-btn"><?php _e('Takaisin', 'water-meter-readings'); ?></button>
+                <button type="submit" class="submit-btn"><?php _e('Lähetä lukemat', 'water-meter-readings'); ?></button>
+            </div>
         </div>
     </form>
     

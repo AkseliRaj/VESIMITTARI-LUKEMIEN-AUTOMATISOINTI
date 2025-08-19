@@ -4,10 +4,11 @@ A comprehensive WordPress plugin for managing water meter readings for condomini
 
 ## Features
 
-- **Public Form**: Simple HTML form for residents to submit water meter readings
+- **Two-Step Public Form**: User-friendly form with condominium number validation and address selection
+- **Address Management**: Admin interface to manage addresses within each condominium
 - **Condominium Management**: Admin interface to add and manage condominiums
 - **Data Visualization**: Interactive charts showing water consumption over time
-- **Authentication**: Simple authentication using condominium numbers
+- **Date Tracking**: Each reading includes a specific date for better tracking
 - **Responsive Design**: Works on desktop and mobile devices
 - **Finnish Language Support**: Interface in Finnish
 
@@ -33,9 +34,9 @@ A comprehensive WordPress plugin for managing water meter readings for condomini
    - Add the shortcode: `[water_meter_form]`
    - Publish the page
 
-2. **Submit Readings**:
-   - Residents enter their condominium number
-   - Input hot and cold water readings
+2. **Submit Readings (Two-Step Process)**:
+   - **Step 1**: Enter condominium number and click "Jatka"
+   - **Step 2**: Select address from dropdown, enter date, and input water readings
    - Add optional notes
    - Submit the form
 
@@ -49,14 +50,20 @@ A comprehensive WordPress plugin for managing water meter readings for condomini
    - Add new condominiums with unique numbers
    - View and delete existing condominiums
 
-3. **View Data and Charts**:
+3. **Manage Addresses**:
+   - Go to Water Meters → Addresses
+   - Select a condominium from the dropdown
+   - Add addresses (e.g., "Haarantie 2 A1", "Haarantie 2 A2")
+   - View and delete existing addresses
+
+4. **View Data and Charts**:
    - Go to Water Meters → Dashboard
    - Select a condominium from the dropdown
-   - View water consumption charts and tables
+   - View water consumption charts and tables with address information
 
 ## Database Structure
 
-The plugin creates two main tables:
+The plugin creates three main tables:
 
 ### `wp_water_meter_condominiums`
 - `id`: Primary key
@@ -65,9 +72,17 @@ The plugin creates two main tables:
 - `address`: Physical address (optional)
 - `created_at`: Timestamp
 
+### `wp_water_meter_addresses`
+- `id`: Primary key
+- `condominium_id`: Foreign key to condominiums table
+- `address_text`: Address text (e.g., "Haarantie 2 A1")
+- `created_at`: Timestamp
+
 ### `wp_water_meter_readings`
 - `id`: Primary key
 - `condominium_id`: Foreign key to condominiums table
+- `address_id`: Foreign key to addresses table
+- `reading_date`: Date of the reading
 - `hot_water`: Hot water reading (decimal)
 - `cold_water`: Cold water reading (decimal)
 - `notes`: Additional notes (text)
@@ -79,15 +94,16 @@ The plugin creates two main tables:
 water-meter-readings/
 ├── water-meter-readings.php          # Main plugin file
 ├── templates/
-│   ├── form.php                      # Public form template
+│   ├── form.php                      # Public form template (two-step)
 │   ├── admin-dashboard.php           # Admin dashboard template
-│   └── admin-condominiums.php        # Condominiums management template
+│   ├── admin-condominiums.php        # Condominiums management template
+│   └── admin-addresses.php           # Addresses management template
 ├── assets/
 │   ├── css/
 │   │   ├── style.css                 # Public form styles
 │   │   └── admin.css                 # Admin interface styles
 │   └── js/
-│       ├── script.js                 # Public form JavaScript
+│       ├── script.js                 # Public form JavaScript (two-step)
 │       └── admin.js                  # Admin interface JavaScript
 └── README.md                         # This file
 ```
@@ -150,6 +166,13 @@ For support and questions:
 This plugin is licensed under the GPL v2 or later.
 
 ## Changelog
+
+### Version 1.1.0
+- **Two-Step Form**: Implemented user-friendly two-step form process
+- **Address Management**: Added address management system for condominiums
+- **Date Tracking**: Added date field for each reading
+- **Enhanced Admin Interface**: Added addresses management page
+- **Improved UX**: Better form flow with validation and address selection
 
 ### Version 1.0.0
 - Initial release
