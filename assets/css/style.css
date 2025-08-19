@@ -15,19 +15,40 @@
 .water-meter-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 40px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 15px;
 }
 
 .form-group label {
     font-weight: 600;
     color: #555;
     font-size: 14px;
+}
+
+/* Defensive: hide stray <br> tags some themes/plugins inject inside forms */
+.water-meter-form br {
+    display: none !important;
+}
+
+/* Neutralize auto-inserted paragraphs inside the form container */
+.water-meter-form-container > p {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+}
+.water-meter-form-container > p:empty {
+    display: none !important;
+}
+
+/* Reduce gap when a paragraph directly precedes our form container */
+.wp-site-blocks p:has(+ .water-meter-form-container),
+.entry-content p:has(+ .water-meter-form-container) {
+    margin-bottom: 8px !important;
 }
 
 .form-group input,

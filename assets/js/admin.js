@@ -6,6 +6,18 @@ jQuery(document).ready(function($) {
             window.location.href = 'admin.php?page=water-meter-readings&condominium_id=' + condominiumId;
         }
     });
+
+    // Address filter change handler
+    $('#address-filter').on('change', function() {
+        var addressId = $(this).val();
+        var params = new URLSearchParams(window.location.search);
+        if (addressId && addressId !== '0') {
+            params.set('address_id', addressId);
+        } else {
+            params.delete('address_id');
+        }
+        window.location.search = params.toString();
+    });
     
     // Initialize charts if data is available
     if (typeof chartData !== 'undefined' && chartData.length > 0) {

@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WMR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WMR_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('WMR_VERSION', '1.0.0');
+define('WMR_VERSION', '1.1.0');
 
 // Main plugin class
 class WaterMeterReadings {
@@ -45,6 +45,9 @@ class WaterMeterReadings {
         
         // Add admin menu
         add_action('admin_menu', array($this, 'admin_menu'));
+
+        // Ensure database schema is up to date
+        $this->maybe_upgrade_db();
     }
     
     public function activate() {
@@ -93,6 +96,7 @@ class WaterMeterReadings {
             reading_date date NOT NULL,
             hot_water decimal(10,2) NOT NULL,
             cold_water decimal(10,2) NOT NULL,
+            resident_name varchar(255) DEFAULT NULL,
             notes text,
             submitted_at datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
@@ -169,6 +173,7 @@ class WaterMeterReadings {
         $reading_date = sanitize_text_field($_POST['reading_date']);
         $hot_water = floatval($_POST['hot_water']);
         $cold_water = floatval($_POST['cold_water']);
+        $resident_name = isset($_POST['resident_name']) ? sanitize_text_field($_POST['resident_name']) : null;
         $notes = sanitize_textarea_field($_POST['notes']);
         
         global $wpdb;
@@ -203,9 +208,10 @@ class WaterMeterReadings {
                 'reading_date' => $reading_date,
                 'hot_water' => $hot_water,
                 'cold_water' => $cold_water,
+                'resident_name' => $resident_name,
                 'notes' => $notes
             ),
-            array('%d', '%d', '%s', '%f', '%f', '%s')
+            array('%d', '%d', '%s', '%f', '%f', '%s', '%s')
         );
         
         if ($result) {
@@ -258,6 +264,22 @@ class WaterMeterReadings {
     
     public function addresses_page() {
         include WMR_PLUGIN_PATH . 'templates/admin-addresses.php';
+    }
+
+    private function maybe_upgrade_db() {
+        global $wpdb;
+        $table_readings = $wpdb->prefix . 'water_meter_readings';
+
+        // Add resident_name column if it does not exist
+        $column = $wpdb->get_var($wpdb->prepare(
+            "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = 'resident_name'",
+            DB_NAME,
+            $table_readings
+        ));
+
+        if (!$column) {
+            $wpdb->query("ALTER TABLE {$table_readings} ADD COLUMN resident_name varchar(255) DEFAULT NULL AFTER cold_water");
+        }
     }
 }
 

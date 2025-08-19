@@ -17,13 +17,32 @@ if ($selected_condominium_id) {
         $selected_condominium_id
     ));
     
-    // Get readings for the selected condominium
-    $readings = $wpdb->get_results($wpdb->prepare(
-        "SELECT r.*, a.address_text 
-         FROM {$wpdb->prefix}water_meter_readings r 
-         LEFT JOIN {$wpdb->prefix}water_meter_addresses a ON r.address_id = a.id 
-         WHERE r.condominium_id = %d 
-         ORDER BY r.submitted_at DESC",
+    // Selected address filter
+    $selected_address_id = isset($_GET['address_id']) ? intval($_GET['address_id']) : 0;
+    // Get readings for the selected condominium (optionally filtered by address)
+    if ($selected_address_id) {
+        $readings = $wpdb->get_results($wpdb->prepare(
+            "SELECT r.*, a.address_text 
+             FROM {$wpdb->prefix}water_meter_readings r 
+             LEFT JOIN {$wpdb->prefix}water_meter_addresses a ON r.address_id = a.id 
+             WHERE r.condominium_id = %d AND r.address_id = %d
+             ORDER BY r.reading_date DESC, r.submitted_at DESC",
+            $selected_condominium_id,
+            $selected_address_id
+        ));
+    } else {
+        $readings = $wpdb->get_results($wpdb->prepare(
+            "SELECT r.*, a.address_text 
+             FROM {$wpdb->prefix}water_meter_readings r 
+             LEFT JOIN {$wpdb->prefix}water_meter_addresses a ON r.address_id = a.id 
+             WHERE r.condominium_id = %d 
+             ORDER BY r.reading_date DESC, r.submitted_at DESC",
+            $selected_condominium_id
+        ));
+    }
+    // Addresses for filter
+    $condo_addresses = $wpdb->get_results($wpdb->prepare(
+        "SELECT id, address_text FROM {$wpdb->prefix}water_meter_addresses WHERE condominium_id = %d ORDER BY address_text",
         $selected_condominium_id
     ));
 }
@@ -43,6 +62,17 @@ if ($selected_condominium_id) {
                 </option>
             <?php endforeach; ?>
         </select>
+        <?php if ($selected_condominium_id && !empty($condo_addresses)): ?>
+            <label for="address-filter" style="margin-left: 1rem;"><?php _e('Address:', 'water-meter-readings'); ?></label>
+            <select id="address-filter">
+                <option value="0"><?php _e('-- All addresses --', 'water-meter-readings'); ?></option>
+                <?php foreach ($condo_addresses as $addr): ?>
+                    <option value="<?php echo $addr->id; ?>" <?php selected(isset($selected_address_id)?$selected_address_id:0, $addr->id); ?>>
+                        <?php echo esc_html($addr->address_text); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
     </div>
     
     <?php if ($selected_condominium_id && $condominium): ?>
@@ -75,8 +105,9 @@ if ($selected_condominium_id) {
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th><?php _e('Date', 'water-meter-readings'); ?></th>
+                            <th><?php _e('Reading date', 'water-meter-readings'); ?></th>
                             <th><?php _e('Address', 'water-meter-readings'); ?></th>
+                            <th><?php _e('Name', 'water-meter-readings'); ?></th>
                             <th><?php _e('Hot Water', 'water-meter-readings'); ?></th>
                             <th><?php _e('Cold Water', 'water-meter-readings'); ?></th>
                             <th><?php _e('Total', 'water-meter-readings'); ?></th>
@@ -95,8 +126,9 @@ if ($selected_condominium_id) {
                             $prev_cold = $reading->cold_water;
                         ?>
                             <tr>
-                                <td><?php echo date('d.m.Y H:i', strtotime($reading->submitted_at)); ?></td>
+                                <td><?php echo date('d.m.Y', strtotime($reading->reading_date)); ?></td>
                                 <td><?php echo esc_html($reading->address_text); ?></td>
+                                <td><?php echo esc_html($reading->resident_name); ?></td>
                                 <td>
                                     <?php echo number_format($reading->hot_water, 2); ?>
                                     <?php if ($hot_diff > 0): ?>
@@ -124,7 +156,7 @@ if ($selected_condominium_id) {
             // Chart data
             var chartData = <?php echo json_encode(array_map(function($reading) {
                 return [
-                    'date' => date('d.m.Y', strtotime($reading->submitted_at)),
+                    'date' => date('d.m.Y', strtotime($reading->reading_date)),
                     'hot_water' => floatval($reading->hot_water),
                     'cold_water' => floatval($reading->cold_water)
                 ];

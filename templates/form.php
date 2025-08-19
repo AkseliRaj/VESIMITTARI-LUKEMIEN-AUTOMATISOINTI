@@ -22,6 +22,11 @@
         </div>
         
         <div class="form-group">
+            <label for="resident_name"><?php _e('Nimi (Etunimi ja sukunimi)', 'water-meter-readings'); ?></label>
+            <input type="text" id="resident_name" name="resident_name" placeholder="Etunimi Sukunimi">
+        </div>
+
+        <div class="form-group">
             <label for="reading_date"><?php _e('Päivämäärä', 'water-meter-readings'); ?> *</label>
             <input type="date" id="reading_date" name="reading_date" required>
         </div>

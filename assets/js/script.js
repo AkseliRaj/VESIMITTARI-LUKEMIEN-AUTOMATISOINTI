@@ -1,5 +1,13 @@
 jQuery(document).ready(function($) {
     var currentCondominiumNumber = '';
+    // Remove stray <br> tags injected by themes/plugins inside our form
+    $('.water-meter-form .form-group > br').remove();
+    // Remove leading empty <p> tags WordPress may auto-insert around shortcodes/blocks
+    $('.water-meter-form-container > p').each(function() {
+        if ($(this).text().trim() === '' && $(this).children().length === 0) {
+            $(this).remove();
+        }
+    });
     
     // Step 1: Handle condominium number submission
     $('#step1-form').on('submit', function(e) {
@@ -45,8 +53,11 @@ jQuery(document).ready(function($) {
                             $addressSelect.append('<option value="' + address.id + '">' + address.address_text + '</option>');
                         });
                         
-                        // Set default date to today
-                        var today = new Date().toISOString().split('T')[0];
+                        // Set default date to today in local timezone
+                        var now = new Date();
+                        var tzOffset = now.getTimezoneOffset();
+                        var local = new Date(now.getTime() - (tzOffset * 60000));
+                        var today = local.toISOString().split('T')[0];
                         $('#reading_date').val(today);
                         
                         // Show step 2
@@ -94,6 +105,7 @@ jQuery(document).ready(function($) {
             reading_date: $('#reading_date').val(),
             hot_water: $('#hot_water').val(),
             cold_water: $('#cold_water').val(),
+            resident_name: $('#resident_name').val(),
             notes: $('#notes').val()
         };
         
