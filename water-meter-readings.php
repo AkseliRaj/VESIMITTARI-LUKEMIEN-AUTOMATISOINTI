@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/your-username/water-meter-readings
  * Description: A simple water meter readings management system for condominiums
  * Version: 1.0.0
- * Author: Your Name
+ * Author: Akseli Rajahalme
  * License: GPL v2 or later
  * Text Domain: water-meter-readings
  */
